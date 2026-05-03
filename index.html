@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetWatch — SIEM Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="scanline"></div>
+  <!-- HEADER -->
+  <header id="header">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      NETWATCH / SIEM DASHBOARD
+    </div>
+    <div class="status-bar">
+      <div class="status-pill">
+        <div class="dot green"></div> IDS Active
+      </div>
+      <div class="status-pill">
+        <div class="dot red"></div>
+        <span id="alert-count">0</span> Active Alerts
+      </div>
+      <div class="timestamp" id="clock">--:--:--</div>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <main class="main" id="main">
+
+    <!-- Row 1: Stat Cards (spans all 3 columns) -->
+    <div class="stats-row">
+      <div class="card stat-card red">
+        <div class="stat-label">Threats Detected</div>
+        <div class="stat-value red" id="stat-threats">0</div>
+        <div class="stat-sub">last 24h</div>
+      </div>
+      <div class="card stat-card green">
+        <div class="stat-label">Packets Analyzed</div>
+        <div class="stat-value green" id="stat-packets">0</div>
+        <div class="stat-sub">via Scapy + Wireshark</div>
+      </div>
+      <div class="card stat-card amber">
+        <div class="stat-label">Detection Accuracy</div>
+        <div class="stat-value amber">95%</div>
+        <div class="stat-sub">SIEM classification</div>
+      </div>
+      <div class="card stat-card blue">
+        <div class="stat-label">Avg Response Time</div>
+        <div class="stat-value blue" id="stat-resp">0ms</div>
+        <div class="stat-sub">50% faster vs baseline</div>
+      </div>
+    </div>
+
+    <!-- Row 2: Traffic Graph (2 cols) + Threat Gauge (1 col) -->
+    <div class="card traffic-card">
+      <div class="card-header">
+        Network Traffic · Real-time (pkt/s)
+        <span class="badge badge-green">LIVE</span>
+      </div>
+      <canvas id="trafficCanvas" height="120"></canvas>
+    </div>
+
+    <div class="card gauge-card">
+      <div class="card-header">
+        Threat Level Index
+        <span class="badge badge-amber" id="threat-label">ELEVATED</span>
+      </div>
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 160 90">
+          <path d="M 10 80 A 70 70 0 0 1 150 80"
+            fill="none" stroke="rgba(255,255,255,0.06)"
+            stroke-width="14" stroke-linecap="round"/>
+          <path id="gauge-arc" d="M 10 80 A 70 70 0 0 1 150 80"
+            fill="none" stroke="#FFB800"
+            stroke-width="14" stroke-linecap="round"
+            stroke-dasharray="220" stroke-dashoffset="110"/>
+        </svg>
+        <div class="gauge-label">
+          <div class="gauge-number" id="gauge-val">62</div>
+          <div class="gauge-text">/ 100 threat index</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Threat Log (2 cols) + Top IPs (1 col) -->
+    <div class="card log-card">
+      <div class="card-header">
+        Threat Event Log
+        <span class="badge badge-red" id="log-badge">● STREAMING</span>
+      </div>
+      <div id="log-container">
+        <div class="log-header-row">
+          <span class="lh time">TIME</span>
+          <span class="lh sev">SEV</span>
+          <span class="lh src">SOURCE IP</span>
+          <span class="lh msg">EVENT</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card map-card">
+      <div class="card-header">
+        Top Threat Sources
+        <span class="badge badge-red">GEO</span>
+      </div>
+      <div class="ip-list" id="ip-list"></div>
+    </div>
+
+  </main>
+
+  <!-- CONTROLS -->
+  <footer class="controls">
+    <button class="btn btn-red"   id="pause-btn"  onclick="togglePause()">⏸ Pause Feed</button>
+    <button class="btn btn-amber"                  onclick="clearAlerts()">✕ Clear Alerts</button>
+    <button class="btn btn-green"                  onclick="simulateAttack()">⚡ Simulate Attack</button>
+    <select class="filter-select" id="sev-filter"  onchange="applyFilter()">
+      <option value="ALL">All Severity</option>
+      <option value="CRIT">Critical Only</option>
+      <option value="HIGH">High+</option>
+      <option value="MED">Medium+</option>
+    </select>
+    <input class="search-input" id="search-input"
+           type="text" placeholder="Filter by IP or event..."
+           oninput="applyFilter()">
+    <span style="flex:1"></span>
+    <span class="footer-label">
+      HARSH SINGH · NETWORK THREAT MONITOR v1.0 · PYTHON + SCAPY + WIRESHARK
+    </span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
